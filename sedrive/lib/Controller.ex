@@ -16,7 +16,7 @@ defmodule Controller do
     block_size() * block_count()
   end
 
-  @type instr :: {:get, integer, caller} | {:set, integer, boolean}
+  @type instr :: {:get, integer, pid} | {:set, integer, boolean}
 
   @spec loop(pid, %{integer => [instr]}) :: no_return
   defp loop(comms, queued) do
