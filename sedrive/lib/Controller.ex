@@ -16,7 +16,7 @@ defmodule Controller do
     block_size() * block_count()
   end
 
-  @type instr :: {:get, integer} | {:set, integer, boolean}
+  @type instr :: {:get, integer, caller} | {:set, integer, boolean}
 
   @spec loop(pid, %{integer => [instr]}) :: no_return
   defp loop(comms, queued) do
@@ -26,7 +26,7 @@ defmodule Controller do
         loop(comms, %{queued | block => block_instr})
       {:refresh_block, block} ->
         buf = read_block(comms, block)
-        buf = apply_instrs(queued[block], buf)
+        buf = apply_instrs(buf, queued[block], block)
         write_block(comms, block, buf)
         queued(comms, Map.delete(queued, block))
       :refresh ->
@@ -38,16 +38,16 @@ defmodule Controller do
   end
 
   @spec make_block_instr(instr) :: {:ok, integer, instr} | {:err, :instr_out_of_range}
-  def make_block_instr({:get, index}) do
+  defp make_block_instr({:get, index, caller}) do
     block = div(index, block_size())
     index = rem(index, block_size())
     if block < block_count() do
-      {:ok, block, {:get, index}}
+      {:ok, block, {:get, index, caller}}
     else
       {:err, :instr_out_of_range}
     end
   end
-  def make_block_instr({:set, index, val}) do
+  defp make_block_instr({:set, index, val}) do
     block = div(index, block_size())
     index = rem(index, block_size())
     if block < block_count() do
@@ -55,6 +55,22 @@ defmodule Controller do
     else
       {:err, :instr_out_of_range}
     end
+  end
+
+  @spec apply_instrs(bitstring, [instr]) :: bitstring
+  defp apply_instrs(buf, instrs, block) do
+    Enum.reduce(instrs, buf, &apply_instr(&1, &2, block))
+  end
+
+  @spec apply_instr(instr, bitstring, integer) :: bitstring
+  defp apply_instr({:get, index, caller}, buf, block) do
+    bit = index_bitstring(buf, index)
+    index = make_not_block_instr(block, {:get, index, caller})
+    send caller, {:got, index, bit}
+    buf
+  end
+  defp apply_instr({:set, index, val}, buf, _block) do
+    set_bitstring(buf, index, val)
   end
 end
 
