@@ -35,8 +35,19 @@ defmodule SEDrive.Conn.Cache do
   def from_single_header(url, header_name, hit_value) do
     %__MODULE__{
       url: & "#{url}?#{Enum.join(&1, "&")}",
-      hit?: & {:ok, Keyword.get(&1, header_name) == hit_value}
+      hit?: &is_header(&1, header_name, hit_value)
     }
   end
+
+  defmodule CachingHeaderNotFoundError do
+
+
+  defp is_header(headers, target_name, target_value) do
+    pair = Enum.find(headers, fn {name, _} -> name == target_name end)
+    with {_, value} <- pair
+    do
+      {:ok, value == target_value}
+    else
+      {:err, 
 end
 
