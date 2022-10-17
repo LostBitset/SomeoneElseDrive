@@ -43,7 +43,7 @@ defmodule SEDrive.Controller do
   end
 
   @spec refresh_file(String.t, [instr], integer) :: nil
-  def refresh_file(file, instrs, integer) do
+  def refresh_file(file, instrs, next_period) do
     "not yet defined"
   end
 end
