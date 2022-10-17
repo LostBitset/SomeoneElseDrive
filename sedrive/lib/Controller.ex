@@ -15,14 +15,22 @@ defmodule SEDrive.Controller do
   end
 
   @impl true
-  def handle_cast({:read, file}, _from, state) do
+  def handle_cast({:read, file, caller}, state) do
+    {:noreply, cons_instr(state, file, {:read, caller})}
+  end
+  def handle_cast({:write, file, contents}, state) do
+    {:noreply, cons_instr(state, file, {:write, contents})}
+  end
+
+  @spec cons_instr(state, String.t, instr) :: state
+  defp cons_instr(state, file, instr) do
     tail =
       if Map.has_key?(state, file) do
         []
       else
         state[file]
       end
-    {:noreply, 
+    %{state | file => [instr | tail]}
   end
 end
 
