@@ -40,7 +40,12 @@ defmodule SEDrive.Conn.Cache do
   end
 
   defmodule CachingHeaderNotFoundError do
-
+    @moduledoc """
+    An exception that should be raised when the header used to indicate the status
+    of the cache was not found in the response.
+    """
+    defexception message: "The header used to indicate cache status was not found."
+  end
 
   defp is_header(headers, target_name, target_value) do
     pair = Enum.find(headers, fn {name, _} -> name == target_name end)
@@ -48,6 +53,8 @@ defmodule SEDrive.Conn.Cache do
     do
       {:ok, value == target_value}
     else
-      {:err, 
+      nil -> {:err, CachingHeaderNotFoundError}
+    end
+  end
 end
 
