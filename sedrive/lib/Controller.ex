@@ -1,8 +1,12 @@
 defmodule SEDrive.Controller do
   use GenServer
-  alias SEDrive.ArrayInstrs, as: Instr
 
-  @type state :: %{String.t => [Instr.t]}
+  @typedoc """
+  An instruction for what to do with a file
+  """
+  @type instr :: {:read, caller :: pid} | {:write, contents :: String.t}
+
+  @type state :: %{String.t => [instr]}
 
   @impl true
   @spec init(:ok) :: {:ok, state}
@@ -31,7 +35,7 @@ defmodule SEDrive.Controller do
     end
   end
 
-  @spec cons_instr(state, String.t, Instr.t) :: state
+  @spec cons_instr(state, String.t, instr) :: state
   defp cons_instr(state, file, instr) do
     tail =
       if Map.has_key?(state, file) do
@@ -42,7 +46,7 @@ defmodule SEDrive.Controller do
     %{state | file => [instr | tail]}
   end
 
-  @spec refresh_file(String.t, [Instr.t], integer) :: nil
+  @spec refresh_file(String.t, [instr], integer) :: nil
   defp refresh_file(file, instrs, next_period) do
     "not yet defined"
   end
