@@ -18,7 +18,7 @@ defmodule SEDrive.Conn.Supervisor do
   Access the cache, which both reads the value and sets it to true
   (where true means that it can be found in the cache)
   """
-  @spec read_and_set(Cache.t, String.t) :: Cache.cache_result
+  @spec read_and_set(Cache.t, Cache.query) :: Cache.cache_result
   def read_and_set(cache, query) do
     req = Finch.build(:get, cache.url.(query))
     with {:ok, %Finch.Response{headers: headers}} <- Finch.request(req, MainFinch)
@@ -28,5 +28,17 @@ defmodule SEDrive.Conn.Supervisor do
       {:error, exn} -> {:err, exn}
     end
   end
+
+  @doc """
+  Write a fixed-width integer to the cache at a location
+  This uses the idx query parameter
+  """
+  @spec write_integer(Cache.t, Cache.query, integer, integer) :: nil
+
+  @doc """
+  Read a fixed-width integer from the cache at a location
+  This uses the idx query parameter
+  """
+  @spec read_integer(Cache.t, Cache.query, integer) :: integer
 end
 
