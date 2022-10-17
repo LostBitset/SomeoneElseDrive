@@ -1,4 +1,4 @@
 defmodule CacheArrays do
   use GenServer
+end
 
-  @impl true
