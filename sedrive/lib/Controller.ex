@@ -1,11 +1,6 @@
 defmodule SEDrive.Controller do
   use GenServer
 
-  @typedoc """
-  An instruction about what to do with a file
-  """
-  @type instr :: {:read, caller :: pid} | {:write, new_contents :: String.t}
-
   @type state :: %{String.t => [instr]}
 
   @impl true
