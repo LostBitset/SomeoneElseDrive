@@ -20,6 +20,18 @@ defmodule SEDrive do
   Just a test for now.
   """
   def main do
+    {cache, prefix} = setup()
+    SEDrive.Rw.Supervisor.start_link(cache)
+  end
+
+  defp file(filename, prefix) do
+    ["_filenm=#{filename}", "_isfile=t" | prefix]
+  end
+
+  @doc """
+  A simple test for the refresh-based raw storage system
+  """
+  def test_refresh_system do
     {cache, loc} = setup()
     SEDrive.Refresh.Supervisor.start_link([])
     IO.puts "Creating..."
