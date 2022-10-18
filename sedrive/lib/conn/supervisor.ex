@@ -56,7 +56,14 @@ defmodule SEDrive.Conn.Supervisor do
     |> Enum.map(fn bit ->
       {bit, read_and_set(cache, ["idx=#{bit}" | loc])}
     end)
-    |> Enum.map(fn {bit, {:ok, value}} -> value <<< bit end)
+    |> Enum.map(fn {bit, {:ok, bool}} ->
+      if bool do
+        {bit, 1}
+      else
+        {bit, 0}
+      end
+    end)
+    |> Enum.map(fn {bit, value} -> value <<< bit end)
     |> Enum.sum()
   end
 end
