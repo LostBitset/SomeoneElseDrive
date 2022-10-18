@@ -30,11 +30,13 @@ defmodule SEDrive.Conn.Supervisor do
     end
   end
 
+  @typep nni :: non_neg_integer
+
   @doc """
   Write a fixed-width integer to the cache at a location
   This uses the _bitidx query parameter
   """
-  @spec write_integer(Cache.t, Cache.query, integer, integer) :: nil
+  @spec write_integer(Cache.t, Cache.query, nni, nni) :: nil
   def write_integer(cache, loc, num, width) do
     0..(width - 1)
     |> Enum.flat_map(fn bit ->
@@ -57,7 +59,7 @@ defmodule SEDrive.Conn.Supervisor do
   Read a fixed-width integer from the cache at a location
   This uses the _bitidx query parameter
   """
-  @spec read_destroy_integer(Cache.t, Cache.query, integer) :: integer
+  @spec read_destroy_integer(Cache.t, Cache.query, nni) :: nni
   def read_destroy_integer(cache, loc, width) do
     0..(width - 1)
     |> Enum.map(fn bit ->
@@ -78,6 +80,32 @@ defmodule SEDrive.Conn.Supervisor do
     end)
     |> Enum.map(fn {bit, value} -> value <<< bit end)
     |> Enum.sum()
+  end
+
+  @doc """
+  Write an integer of unknown width to the cache at a location
+  This uses the _bitidx and _ufield query parameters
+  """
+  @spec write_dyn(Cache.t, Cache.query, nni) :: nil
+  def write_dyn(cache, loc, num) do
+    width = bit_size_nni(num)
+    write_integer(cache, ["_ufield=len" | loc], width, 8)
+    write_integer(cache, ["_ufield=dat" | loc], num, width)
+    nil
+  end
+
+  @doc """
+  Read an integer of unknown width from the cache at a location
+  This uses the _bitidx and _ufield query parameters
+  """
+  @spec read_destroy_dyn(Cache.t, Cache.query) :: nni
+  def read_destroy_dyn(cache, loc) do
+    width = read_destroy_integer(cache, ["_ufield=len" | loc], 8)
+    read_destroy_integer(cache, ["_ufield=dat" | loc], width)
+  end
+
+  defp bit_size_nni(num) do
+    num |> :binary.encode_unsigned |> bit_size
   end
 end
 
