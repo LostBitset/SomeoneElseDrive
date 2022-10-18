@@ -37,5 +37,22 @@ defmodule SEDrive.Rw.Server do
       end
     {:noreply, {cache, %{instrs | loc => new_instr}}}
   end
+
+  @impl true
+  def handle_cast({:write, loc, contents}, {cache, instrs}) do
+    new_instr =
+      if Map.has_key?(instrs, loc) do
+        %{
+          instrs[loc] |
+          write: contents
+        }
+      else
+        %{
+          read: [],
+          write: contents
+        }
+      end
+    {:noreply, {cache, %{instrs | loc => new_instr}}}
+  end
 end
 
