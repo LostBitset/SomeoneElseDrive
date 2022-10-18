@@ -4,7 +4,6 @@ defmodule SEDrive.Rw.Supervisor do
   of SEDrive.
   """
   use Supervisor
-  alias SEDrive.Conn.Cache, as: Cache
   alias SEDrive.Refresh.Supervisor, as: RefreshSup
   alias SEDrive.Rw.Server, as: RwServer
 
@@ -13,7 +12,6 @@ defmodule SEDrive.Rw.Supervisor do
   end
 
   @impl true
-  @spec init({:ok, Cache.t}) :: {:ok, {Supervisor.sup_flags, term}}
   def init({:ok, cache}) do
     children = [
       {RefreshSup, cache},
