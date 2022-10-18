@@ -23,7 +23,7 @@ defmodule SEDrive.Refresh.Supervisor do
   @typedoc """
   Error return types from the refresh/3 function.
   """
-  @type refresh_error :: {:err, :in_use} | {:err, :no_source} | {:err, :other, Exception.t}
+  @type refresh_error :: {:err, :in_use} | {:err, :other, Exception.t}
 
   @doc """
   Refresh a known location on the cache.
@@ -33,13 +33,17 @@ defmodule SEDrive.Refresh.Supervisor do
     curr_period = period_now()
     with {:ok, period_claimed?} <- claim_period(cache, loc, curr_period)
     do
-      if period_claimed? do
+      if !period_claimed? do
         if new_contents == nil do
-          src_period = find_src_period(cache, loc, curr_period - 1)
-          if src_period == :never_existed do
-            {:err, :no_source}
+          with {:ok, src_period} <- find_src_period(cache, loc, curr_period - 1)
+          do
+            period_old = Integer.to_string(src_period)
+            old = ConnSup.read_destroy_string(cache, ["_period=#{period_old}" | loc])
+            period_new = Integer.to_string(curr_period)
+            ConnSup.write_string(cache, ["_period=#{period_new}" | loc], old)
+            {:ok, old}
           else
-            {:ok, "TODO"}
+            {:err, exn} -> {:err, :other, exn}
           end
         else
           period = Integer.to_string(curr_period)
@@ -60,7 +64,19 @@ defmodule SEDrive.Refresh.Supervisor do
     ConnSup.read_and_set(cache, ["_rspper=has", "_period=#{period}" | loc])
   end
 
-  @spec find_src_period(Cache.t, Cache.query, nni) :: nni | :never_existed
+  @spec find_src_period(Cache.t, Cache.query, nni) :: {:ok, nni} | {:err, Exception.t}
+  defp find_src_period(cache, loc, period) do
+    with {:ok, period_claimed?} <- claim_period(cache, loc, period)
+    do
+      if !period_claimed? do
+        find_src_period(cache, loc, period - 1)
+      else
+        {:ok, period}
+      end
+    else
+      {:err, exn} -> {:err, exn}
+    end
+  end
 
   @spec period_now :: nni
   defp period_now do
