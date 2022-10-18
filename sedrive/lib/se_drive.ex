@@ -35,8 +35,8 @@ defmodule SEDrive do
     IO.puts "Refreshing..."
     res = SEDrive.Refresh.Supervisor.refresh(cache, loc, new)
     IO.puts "Decoded from cache: #{inspect res}"
-    IO.puts "Waiting..."
-    :timer.sleep(6000)
+    IO.puts "Waiting (for multiple periods)..."
+    :timer.sleep(11000)
     IO.puts "Refreshing..."
     res = SEDrive.Refresh.Supervisor.refresh(cache, loc)
     IO.puts "Decoded from cache: #{inspect res}"
