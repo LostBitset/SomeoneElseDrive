@@ -62,6 +62,7 @@ defmodule SEDrive.Refresh.Supervisor do
   Error return types from the create_new/3 function.
   """
   @type create_new_error :: {:err, :exists_claimed} | {:err, :other, Exception.t}
+
   @doc """
   Create a new location on the cache that can be refreshed.
   """
