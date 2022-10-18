@@ -24,13 +24,12 @@ defmodule SEDrive do
     SEDrive.Conn.Supervisor.start_link([])
     loc = ["xfakesto=blahtest56", "time=#{System.monotonic_time()}"]
     IO.puts "Using location: #{cache.url.(loc)}"
-    num = IO.gets "Enter a number: "
-    {num, "\n"} = Integer.parse(num)
+    str = IO.gets "Enter some text: "
     IO.puts "Writing..."
-    SEDrive.Conn.Supervisor.write_dyn(cache, loc, num)
+    SEDrive.Conn.Supervisor.write_string(cache, loc, str)
     IO.puts "Reading..."
-    res = SEDrive.Conn.Supervisor.read_destroy_dyn(cache, loc)
-    IO.puts "Decoded from cache: #{inspect res}"
+    res = SEDrive.Conn.Supervisor.read_destroy_string(cache, loc)
+    IO.puts "Decoded from cache: #{res}"
   end
 end
 
