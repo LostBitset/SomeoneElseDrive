@@ -52,10 +52,34 @@ defmodule SEDrive.Refresh.Supervisor do
         end
       else
         {:err, :in_use}
-        end
-      else
-        {:err, exn} -> {:err, :other, exn}
       end
+    else
+      {:err, exn} -> {:err, :other, exn}
+    end
+  end
+
+  @typedoc """
+  Error return types from the create_new/3 function.
+  """
+  @type create_new_error :: {:err, :exists_claimed} | {:err, :other, Exception.t}
+  @doc """
+  Create a new location on the cache that can be refreshed.
+  """
+  @spec create_new(Cache.t, Cache.query, String.t) :: :ok | create_new_error
+  def create_new(cache, loc, contents) do
+    curr_period = period_now()
+    with {:ok, period_claimed?} <- claim_period(cache, loc, curr_period)
+    do
+      if !period_claimed? do
+        period = Integer.to_string(curr_period)
+        ConnSup.write_string(cache, ["_period=#{period}" | loc], contents)
+        :ok
+      else
+        {:err, :exists_claimed}
+      end
+    else
+      {:err, exn} -> {:err, :other, exn}
+    end
   end
 
   @spec claim_period(Cache.t, Cache.query, nni) :: Cache.cache_result
