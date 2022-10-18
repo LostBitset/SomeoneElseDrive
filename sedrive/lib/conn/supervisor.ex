@@ -37,12 +37,19 @@ defmodule SEDrive.Conn.Supervisor do
   @spec write_integer(Cache.t, Cache.query, integer, integer) :: nil
   def write_integer(cache, loc, num, width) do
     0..(width - 1)
-    |> Enum.each(fn bit ->
+    |> Enum.flat_map(fn bit ->
       mask = 1 <<< bit
       if (num &&& mask) != 0 do
-        read_and_set(cache, ["_bitidx=#{bit}" | loc])
+        [
+          Task.async(fn ->
+            read_and_set(cache, ["_bitidx=#{bit}" | loc])
+          end)
+        ]
+      else
+        []
       end
     end)
+    |> Enum.each(&Task.await/1)
     nil
   end
 
@@ -54,8 +61,14 @@ defmodule SEDrive.Conn.Supervisor do
   def read_destroy_integer(cache, loc, width) do
     0..(width - 1)
     |> Enum.map(fn bit ->
-      {bit, read_and_set(cache, ["_bitidx=#{bit}" | loc])}
+      {
+        bit,
+        Task.async(fn ->
+          read_and_set(cache, ["_bitidx=#{bit}" | loc])
+        end)
+      }
     end)
+    |> Enum.map(fn {bit, task} -> {bit, Task.await(task)} end)
     |> Enum.map(fn {bit, {:ok, bool}} ->
       if bool do
         {bit, 1}
