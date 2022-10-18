@@ -36,13 +36,14 @@ defmodule SEDrive.Conn.Supervisor do
   """
   @spec write_integer(Cache.t, Cache.query, integer, integer) :: nil
   def write_integer(cache, loc, num, width) do
-      0..(width - 1)
-      |> Enum.each(fn bit ->
-        mask = 1 <<< bit
-        if (num &&& mask) != 0 do
-          read_and_set(cache, ["idx=#{bit}" | loc])
-        end
-      end)
+    0..(width - 1)
+    |> Enum.each(fn bit ->
+      mask = 1 <<< bit
+      if (num &&& mask) != 0 do
+        read_and_set(cache, ["idx=#{bit}" | loc])
+      end
+    end)
+    nil
   end
 
   @doc """
