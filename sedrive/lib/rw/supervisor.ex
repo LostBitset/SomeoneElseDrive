@@ -8,17 +8,20 @@ defmodule SEDrive.Rw.Supervisor do
   alias SEDrive.Refresh.Supervisor, as: RefreshSup
   alias SEDrive.Rw.Server, as: RwServer
 
-  def start_link(opts) do
-    Supervisor.start_link(__MODULE__, :ok, opts)
+  def start_link(cache, opts \\ []) do
+    Supervisor.start_link(__MODULE__, {:ok, cache}, opts)
   end
 
   @impl true
-  def init(:ok) do
+  @spec init({:ok, Cache.t}) :: {:ok, {Supervisor.sup_flags, term}}
+  def init({:ok, cache}) do
     children = [
-      RefreshSup,
+      {RefreshSup, cache},
       RwServer
     ]
     Supervisor.init(children, strategy: :one_for_one)
   end
+
+
 end
 
