@@ -40,7 +40,7 @@ defmodule SEDrive.Conn.Supervisor do
       |> Enum.each(fn bit ->
         mask = 1 <<< bit
         if (num &&& mask) != 0 do
-          read_and_set(cache, [loc | "idx=#{bit}"])
+          read_and_set(cache, ["idx=#{bit}" | loc])
         end
       end)
   end
@@ -49,6 +49,14 @@ defmodule SEDrive.Conn.Supervisor do
   Read a fixed-width integer from the cache at a location
   This uses the idx query parameter
   """
-  @spec read_integer(Cache.t, Cache.query, integer) :: integer
+  @spec read_destroy_integer(Cache.t, Cache.query, integer) :: integer
+  def read_destroy_integer(cache, loc, width) do
+    0..(width - 1)
+    |> Enum.map(fn bit ->
+      {bit, read_and_set(cache, ["idx=#{bit}" | loc])}
+    end)
+    |> Enum.map(fn {bit, value} -> value <<< bit end)
+    |> Enum.sum()
+  end
 end
 
