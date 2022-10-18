@@ -26,7 +26,18 @@ defmodule SEDrive do
     SEDrive.Refresh.Supervisor.create_new(cache, loc, "<initial contents>")
     IO.puts "Waiting..."
     :timer.sleep(6000)
-    IO.puts "Reading..."
+    IO.puts "Refreshing..."
+    res = SEDrive.Refresh.Supervisor.refresh(cache, loc)
+    IO.puts "Decoded from cache: #{inspect res}"
+    new = IO.gets "Enter new contents: "
+    IO.puts "Waiting..."
+    :timer.sleep(6000)
+    IO.puts "Refreshing..."
+    res = SEDrive.Refresh.Supervisor.refresh(cache, loc, new)
+    IO.puts "Decoded from cache: #{inspect res}"
+    IO.puts "Waiting..."
+    :timer.sleep(6000)
+    IO.puts "Refreshing..."
     res = SEDrive.Refresh.Supervisor.refresh(cache, loc)
     IO.puts "Decoded from cache: #{inspect res}"
   end
