@@ -4,6 +4,7 @@ defmodule SEDrive.Rw.Supervisor do
   of SEDrive.
   """
   use Supervisor
+  alias SEDrive.Conn.Cache, as: Cache
   alias SEDrive.Refresh.Supervisor, as: RefreshSup
   alias SEDrive.Rw.Server, as: RwServer
 
@@ -20,6 +21,14 @@ defmodule SEDrive.Rw.Supervisor do
     Supervisor.init(children, strategy: :one_for_one)
   end
 
+  @spec read(Cache.query, pid) :: :ok
+  def read(loc, caller) do
+    GenServer.cast(RefreshSup, {:read, loc, caller})
+  end
 
+  @spec write(Cache.query, String.t) :: :ok
+  def write(loc, contents) do
+    GenServer.cast(RefreshSup, {:write, loc, contents})
+  end
 end
 
