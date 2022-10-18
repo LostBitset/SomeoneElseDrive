@@ -1,5 +1,6 @@
 defmodule SEDrive.Conn.Supervisor do
   use Supervisor
+  import Bitwise
   alias SEDrive.Conn.Cache, as: Cache
 
   def start_link(opts) do
@@ -34,6 +35,15 @@ defmodule SEDrive.Conn.Supervisor do
   This uses the idx query parameter
   """
   @spec write_integer(Cache.t, Cache.query, integer, integer) :: nil
+  def write_integer(cache, loc, num, width) do
+      0..(width - 1)
+      |> Enum.each(fn bit ->
+        mask = 1 <<< bit
+        if (num &&& mask) != 0 do
+          read_and_set(cache, [loc | "idx=#{bit}"])
+        end
+      end)
+  end
 
   @doc """
   Read a fixed-width integer from the cache at a location
