@@ -21,6 +21,7 @@ defmodule SEDrive.Rw.Server do
   @impl true
   @spec init(Cache.t) :: {:ok, state}
   def init(cache) do
+    schedule_next_refresh()
     {:ok, {cache, %{}}}
   end
 
@@ -53,6 +54,47 @@ defmodule SEDrive.Rw.Server do
         }
       end
     {:noreply, {cache, %{instrs | loc => new_instr}}}
+  end
+
+  @impl true
+  def handle_info(:try_refresh, {cache, instrs}) do
+    instrs = Map.keys(instrs)
+    |> Enum.map(fn loc ->
+      try_refresh(cache, loc, instrs[loc])
+    end)
+    |> Enum.reject(fn ret ->
+      with {:ok, refreshed?} <- ret
+      do
+        refreshed?
+      else
+        {:err, exn} -> throw exn
+      end
+    end)
+    schedule_next_refresh()
+    {:noreply, {cache, instrs}}
+  end
+
+  @spec try_refresh(Cache.t, Cache.query, instr) :: {:ok, boolean} | {:err, Exception.t}
+  defp try_refresh(cache, loc, instr) do
+    contents = Map.get(instr, :write)
+    with {:ok, contents} <- RefreshSup.refresh(cache, loc, contents)
+    do
+      instr.read
+      |> Enum.each(fn caller ->
+        send caller, {:got, loc, contents}
+      end)
+         {:ok, true}
+    else
+      {:err, :in_use} ->
+        {:ok, false}
+      {:err, :other, exn} -> {:err, exn}
+    end
+  end
+
+  @spec schedule_next_refresh() :: nil
+  defp schedule_next_refresh do
+    Process.send_after(self(), :try_refresh, 1000)
+    nil
   end
 end
 
