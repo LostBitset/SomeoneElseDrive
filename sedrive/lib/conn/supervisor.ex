@@ -89,7 +89,7 @@ defmodule SEDrive.Conn.Supervisor do
   @spec write_dyn(Cache.t, Cache.query, nni) :: nil
   def write_dyn(cache, loc, num) do
     width = bit_size_nni(num)
-    write_integer(cache, ["_ufield=len" | loc], width, 8)
+    write_integer(cache, ["_ufield=len" | loc], width, 16)
     write_integer(cache, ["_ufield=dat" | loc], num, width)
     nil
   end
@@ -100,12 +100,33 @@ defmodule SEDrive.Conn.Supervisor do
   """
   @spec read_destroy_dyn(Cache.t, Cache.query) :: nni
   def read_destroy_dyn(cache, loc) do
-    width = read_destroy_integer(cache, ["_ufield=len" | loc], 8)
+    width = read_destroy_integer(cache, ["_ufield=len" | loc], 16)
     read_destroy_integer(cache, ["_ufield=dat" | loc], width)
   end
 
   defp bit_size_nni(num) do
     num |> :binary.encode_unsigned |> bit_size
+  end
+
+  @doc """
+  Write a string to the cache at a location
+  This uses the _bitidx and _ufield query parameters
+  """
+  @spec write_string(Cache.t, Cache.query, String.t) :: nil
+  def write_string(cache, loc, str) do
+    bin = :binary.decode_unsigned(str)
+    write_dyn(cache, loc, bin)
+    nil
+  end
+
+  @doc """
+  Read a string from the cache at a location
+  This uses the _bitidx and _ufield query parameters
+  """
+  @spec read_destroy_string(Cache.t, Cache.query) :: String.t
+  def read_destroy_string(cache, loc) do
+    bin = read_destroy_dyn(cache, loc)
+    :binary.encode_unsigned(bin)
   end
 end
 
