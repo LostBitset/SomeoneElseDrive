@@ -32,7 +32,7 @@ defmodule SEDrive.Conn.Supervisor do
 
   @doc """
   Write a fixed-width integer to the cache at a location
-  This uses the idx query parameter
+  This uses the _bitidx query parameter
   """
   @spec write_integer(Cache.t, Cache.query, integer, integer) :: nil
   def write_integer(cache, loc, num, width) do
@@ -40,7 +40,7 @@ defmodule SEDrive.Conn.Supervisor do
     |> Enum.each(fn bit ->
       mask = 1 <<< bit
       if (num &&& mask) != 0 do
-        read_and_set(cache, ["idx=#{bit}" | loc])
+        read_and_set(cache, ["_bitidx=#{bit}" | loc])
       end
     end)
     nil
@@ -48,13 +48,13 @@ defmodule SEDrive.Conn.Supervisor do
 
   @doc """
   Read a fixed-width integer from the cache at a location
-  This uses the idx query parameter
+  This uses the _bitidx query parameter
   """
   @spec read_destroy_integer(Cache.t, Cache.query, integer) :: integer
   def read_destroy_integer(cache, loc, width) do
     0..(width - 1)
     |> Enum.map(fn bit ->
-      {bit, read_and_set(cache, ["idx=#{bit}" | loc])}
+      {bit, read_and_set(cache, ["_bitidx=#{bit}" | loc])}
     end)
     |> Enum.map(fn {bit, {:ok, bool}} ->
       if bool do
