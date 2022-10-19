@@ -36,7 +36,7 @@ defmodule SEDrive.Rw.Server do
       else
         %{read: [caller]}
       end
-    ret = {:noreply, {cache, %{instrs | loc => new_instr}}}
+    ret = {:noreply, {cache, Map.put(instrs, loc, new_instr)}}
     IO.puts "READ #{inspect ret}"
     ret
   end
@@ -55,7 +55,7 @@ defmodule SEDrive.Rw.Server do
           write: contents
         }
       end
-    ret = {:noreply, {cache, %{instrs | loc => new_instr}}}
+    ret = {:noreply, {cache, Map.put(instrs, loc, new_instr)}}
     IO.puts "WRITE #{inspect ret}"
     ret
   end
