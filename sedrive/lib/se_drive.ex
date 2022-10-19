@@ -33,6 +33,21 @@ defmodule SEDrive do
            |> String.trim()
            |> String.downcase()
     case what do
+      "q" ->
+        IO.puts "(seeya)"
+      "w" ->
+        filename = IO.gets "What file do you want to write to: " |> String.trim()
+        loc = file(filename, prefix)
+        read_file_at(loc)
+        contents = IO.gets "What do you want to write: "
+        IO.puts "Writing..."
+        RwSup.write(loc, contents)
+        IO.puts "Ok. Your write has only been saved locally, it won't be saved to SEDrive right away."
+        main(cache, prefix)
+      "r" ->
+        filename = IO.gets "What file do you want to write to: " |> String.trim()
+        loc = file(filename, prefix)
+        read_file_at(loc)
       _ ->
         IO.puts "Not sure what that is, answer one of {\"r\", \"w\", \"q\"}."
         main(cache, prefix)
@@ -41,6 +56,17 @@ defmodule SEDrive do
 
   defp file(filename, prefix) do
     ["_filenm=#{filename}", "_isfile=t" | prefix]
+  end
+
+  defp read_file_at(loc) do
+    IO.puts "Reading..."
+    RwSup.read(loc, self())
+    contents = receive do
+      {:got, _loc, contents} -> contents
+    end
+    IO.puts "This file currently contains: <BEGIN>"
+    IO.puts contents
+    IO.puts "<END>"
   end
 
   @doc """
