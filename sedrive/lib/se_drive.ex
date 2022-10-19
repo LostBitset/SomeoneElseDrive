@@ -50,7 +50,7 @@ defmodule SEDrive do
         IO.puts "Ok. Your write has only been saved locally, it won't be saved to SEDrive right away."
         main(cache, prefix)
       "r" ->
-        filename = IO.gets "What file do you want to write to: "
+        filename = IO.gets "What file do you want to read: "
         filename = String.trim(filename)
         loc = file(filename, prefix)
         read_file_at(loc)
