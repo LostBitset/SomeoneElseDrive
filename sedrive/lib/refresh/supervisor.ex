@@ -86,6 +86,9 @@ defmodule SEDrive.Refresh.Supervisor do
   @spec claim_period(Cache.t, Cache.query, nni) :: Cache.cache_result
   defp claim_period(cache, loc, period) do
     period = Integer.to_string(period)
+    if !is_list(loc) do
+      raise "WhatTheHellIsGoingOnHereError"
+    end
     ConnSup.read_and_set(cache, ["_rspper=has", "_period=#{period}" | loc])
   end
 
