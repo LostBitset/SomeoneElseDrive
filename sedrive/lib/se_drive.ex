@@ -41,7 +41,8 @@ defmodule SEDrive do
         filename = IO.gets "What file do you want to write to: "
         filename = String.trim(filename)
         loc = file(filename, prefix)
-        if IO.gets("Does this file exist already? (y/n): ") == 'y' do
+        already_exists = IO.gets("Does this file exist already? (y/n): ")
+        if String.trim(already_exists) == "y" do
           read_file_at(loc)
         end
         contents = IO.gets "What do you want to write: "
