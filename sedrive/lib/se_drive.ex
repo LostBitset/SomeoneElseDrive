@@ -31,6 +31,7 @@ defmodule SEDrive do
 
   def main(cache, prefix) do
     what = IO.gets "Read (r), write (w), or quit (q): "
+    what = what
            |> String.trim()
            |> String.downcase()
     case what do
