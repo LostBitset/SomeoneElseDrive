@@ -54,6 +54,7 @@ defmodule SEDrive do
         filename = String.trim(filename)
         loc = file(filename, prefix)
         read_file_at(loc)
+        main(cache, prefix)
       _ ->
         IO.puts "Not sure what that is, answer one of {\"r\", \"w\", \"q\"}."
         main(cache, prefix)
