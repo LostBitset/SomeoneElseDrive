@@ -23,14 +23,18 @@ defmodule SEDrive.Rw.Supervisor do
 
   @spec read(Cache.query, pid) :: :ok
   def read(loc, caller) do
-    IO.puts "Casting read to RwServer at #{inspect GenServer.whereis(RwServer)}..."
-    GenServer.cast(RwServer, {:read, loc, caller})
+    GenServer.cast(rw_server(), {:read, loc, caller})
   end
 
   @spec write(Cache.query, String.t) :: :ok
   def write(loc, contents) do
-    IO.puts "Casting write to RwServer at #{inspect GenServer.whereis(RwServer)}..."
-    GenServer.cast(RwServer, {:write, loc, contents})
+    GenServer.cast(rw_server(), {:write, loc, contents})
+  end
+
+  @spec rw_server() :: pid
+  defp rw_server do
+    [_, {_, server, _, _}] = Supervisor.which_children(__MODULE__)
+    server
   end
 end
 
