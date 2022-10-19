@@ -58,18 +58,19 @@ defmodule SEDrive.Rw.Server do
 
   @impl true
   def handle_info(:try_refresh, {cache, instrs}) do
-    instrs = Map.keys(instrs)
-    |> Enum.map(fn loc ->
-      try_refresh(cache, loc, instrs[loc])
-    end)
-    |> Enum.reject(fn ret ->
-      with {:ok, refreshed?} <- ret
-      do
-        refreshed?
-      else
-        {:err, exn} -> throw exn
-      end
-    end)
+    remaining = Map.keys(instrs)
+                |> Enum.map(fn loc ->
+                  try_refresh(cache, loc, instrs[loc])
+                end)
+                |> Enum.reject(fn ret ->
+                  with {:ok, refreshed?} <- ret
+                  do
+                    refreshed?
+                  else
+                    {:err, exn} -> throw exn
+                  end
+                end)
+    instrs = Map.take(instrs, remaining)
     schedule_next_refresh()
     {:noreply, {cache, instrs}}
   end
@@ -93,7 +94,7 @@ defmodule SEDrive.Rw.Server do
 
   @spec schedule_next_refresh() :: nil
   defp schedule_next_refresh do
-    Process.send_after(self(), :try_refresh, 1000)
+    Process.send_after(self(), :try_refresh, 2500)
     nil
   end
 end

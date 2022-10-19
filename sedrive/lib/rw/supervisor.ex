@@ -15,8 +15,8 @@ defmodule SEDrive.Rw.Supervisor do
   @impl true
   def init({:ok, cache}) do
     children = [
-      {RefreshSup, cache},
-      RwServer
+      RefreshSup,
+      {RwServer, cache}
     ]
     Supervisor.init(children, strategy: :one_for_one)
   end
