@@ -23,7 +23,8 @@ defmodule SEDrive do
   def main do
     cache = SEDrive.Conn.Sources.toyota
     RwSup.start_link(cache)
-    key = IO.gets "Enter a key to identify this store: " |> String.trim()
+    key = IO.gets "Enter a key to identify this store: "
+    key = String.trim(key)
     prefix = ["_xsedrv=t", "_verstr=v1", "_identt=stdkey", "_stdkey=#{key}"]
     main(cache, prefix)
   end
@@ -36,7 +37,8 @@ defmodule SEDrive do
       "q" ->
         IO.puts "(seeya)"
       "w" ->
-        filename = IO.gets "What file do you want to write to: " |> String.trim()
+        filename = IO.gets "What file do you want to write to: "
+        filename = String.trim(filename)
         loc = file(filename, prefix)
         read_file_at(loc)
         contents = IO.gets "What do you want to write: "
@@ -45,7 +47,8 @@ defmodule SEDrive do
         IO.puts "Ok. Your write has only been saved locally, it won't be saved to SEDrive right away."
         main(cache, prefix)
       "r" ->
-        filename = IO.gets "What file do you want to write to: " |> String.trim()
+        filename = IO.gets "What file do you want to write to: "
+        filename = String.trim(filename)
         loc = file(filename, prefix)
         read_file_at(loc)
       _ ->
