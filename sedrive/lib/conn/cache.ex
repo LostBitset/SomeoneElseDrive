@@ -34,7 +34,7 @@ defmodule SEDrive.Conn.Cache do
   @spec from_single_header(String.t, String.t, String.t) :: t
   def from_single_header(url, header_name, hit_value) do
     %__MODULE__{
-      url: & "#{url}?#{Enum.join(&1, "&")}",
+      url: & "#{url}?#{Enum.join(IO.inspect(&1), "&")}",
       hit?: &is_header(&1, header_name, hit_value)
     }
   end

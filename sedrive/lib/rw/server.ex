@@ -96,9 +96,11 @@ defmodule SEDrive.Rw.Server do
       |> Enum.each(fn caller ->
         send caller, {:got, loc, contents}
       end)
-         {:ok, true}
+      IO.puts "(refresh ok)"
+      {:ok, true}
     else
       {:err, :in_use} ->
+        IO.puts "(could not claim)"
         {:ok, false}
       {:err, :other, exn} -> {:err, exn}
     end
