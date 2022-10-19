@@ -35,7 +35,7 @@ defmodule SEDrive.Refresh.Supervisor do
     do
       if !period_claimed? do
         if new_contents == nil do
-          with {:ok, src_period} <- find_src_period(cache, loc, curr_period - 1)
+          with {:ok, src_period} <- find_src_period(cache, loc, curr_period - 2)
           do
             period_old = Integer.to_string(src_period)
             old = ConnSup.read_destroy_string(cache, ["_period=#{period_old}" | loc])

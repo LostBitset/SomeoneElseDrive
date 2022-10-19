@@ -87,7 +87,6 @@ defmodule SEDrive.Rw.Server do
 
   @spec try_refresh(Cache.t, Cache.query, instr) :: {:ok, boolean} | {:err, Exception.t}
   defp try_refresh(cache, loc, instr) do
-    IO.inspect {:fun, :try_refresh, cache, loc, instr}
     contents = Map.get(instr, :write)
     with {:ok, contents} <- RefreshSup.refresh(cache, loc, contents)
     do
