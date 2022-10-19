@@ -2,6 +2,7 @@ defmodule SEDrive do
   @moduledoc """
   Documentation for `SEDrive`.
   """
+  alias SEDrive.Rw.Supervisor, as: RwSup
 
   @doc """
   Hello world.
@@ -20,8 +21,22 @@ defmodule SEDrive do
   Just a test for now.
   """
   def main do
-    {cache, prefix} = setup()
-    SEDrive.Rw.Supervisor.start_link(cache)
+    cache = SEDrive.Conn.Sources.toyota
+    RwSup.start_link(cache)
+    key = IO.gets "Enter a key to identify this store: " |> String.trim()
+    prefix = ["_xsedrv=t", "_verstr=v1", "_identt=stdkey", "_stdkey=#{key}"]
+    main(cache, prefix)
+  end
+
+  def main(cache, prefix) do
+    what = IO.gets "Read (r), write (w), or quit (q): "
+           |> String.trim()
+           |> String.downcase()
+    case what do
+      _ ->
+        IO.puts "Not sure what that is, answer one of {\"r\", \"w\", \"q\"}."
+        main(cache, prefix)
+    end
   end
 
   defp file(filename, prefix) do
