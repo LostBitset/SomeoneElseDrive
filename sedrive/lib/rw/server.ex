@@ -15,7 +15,7 @@ defmodule SEDrive.Rw.Server do
   @type state :: {Cache.t, %{Cache.query => instr}}
 
   def start_link(cache) do
-    GenServer.start_link(__MODULE__, cache)
+    GenServer.start_link(__MODULE__, cache, name: __MODULE__)
   end
 
   @impl true
