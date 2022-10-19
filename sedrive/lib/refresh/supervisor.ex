@@ -30,6 +30,9 @@ defmodule SEDrive.Refresh.Supervisor do
   """
   @spec refresh(Cache.t, Cache.query, String.t | nil) :: {:ok, String.t} | refresh_error
   def refresh(cache, loc, new_contents \\ nil) do
+    if !is_list(loc) do
+      raise "wait so its not in this file"
+    end
     curr_period = period_now()
     with {:ok, period_claimed?} <- claim_period(cache, loc, curr_period)
     do

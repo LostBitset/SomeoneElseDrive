@@ -64,9 +64,9 @@ defmodule SEDrive.Rw.Server do
   def handle_info(:try_refresh, {cache, instrs, targets}) do
     remaining = Map.keys(instrs)
                 |> Enum.map(fn loc ->
-                  try_refresh(cache, loc, instrs[loc])
+                  {loc, try_refresh(cache, loc, instrs[loc])}
                 end)
-                |> Enum.reject(fn ret ->
+                |> Enum.reject(fn {_loc, ret} ->
                   with {:ok, refreshed?} <- ret
                   do
                     refreshed?
@@ -74,6 +74,7 @@ defmodule SEDrive.Rw.Server do
                     {:err, exn} -> throw exn
                   end
                 end)
+                |> Enum.map(fn {loc, _ret} -> loc end)
     targets
     |> Enum.reject(
       &Enum.member?(remaining, &1)
@@ -90,6 +91,8 @@ defmodule SEDrive.Rw.Server do
   defp try_refresh(cache, loc, instr) do
     IO.inspect {:fun, :try_refresh, cache, loc, instr}
     contents = Map.get(instr, :write)
+    IO.puts "IN TRY_REFRESH LOC IS:"
+    IO.inspect loc
     with {:ok, contents} <- RefreshSup.refresh(cache, loc, contents)
     do
       instr.read
