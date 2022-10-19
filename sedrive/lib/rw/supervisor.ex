@@ -24,13 +24,13 @@ defmodule SEDrive.Rw.Supervisor do
   @spec read(Cache.query, pid) :: :ok
   def read(loc, caller) do
     IO.puts "Casting read..."
-    GenServer.cast(RefreshSup, {:read, loc, caller})
+    GenServer.cast(RwServer, {:read, loc, caller})
   end
 
   @spec write(Cache.query, String.t) :: :ok
   def write(loc, contents) do
     IO.puts "Casting write..."
-    GenServer.cast(RefreshSup, {:write, loc, contents})
+    GenServer.cast(RwServer, {:write, loc, contents})
   end
 end
 
