@@ -12,7 +12,7 @@ defmodule SEDrive.Rw.Server do
   """
   @type instr :: %{required(:read) => [pid], optional(:write) => String.t}
 
-  @type state :: {Cache.t, %{Cache.query => instr}}
+  @type state :: {Cache.t, %{Cache.query => instr}, [Cache.query]}
 
   def start_link(cache) do
     GenServer.start_link(__MODULE__, cache, name: __MODULE__)
@@ -22,11 +22,11 @@ defmodule SEDrive.Rw.Server do
   @spec init(Cache.t) :: {:ok, state}
   def init(cache) do
     schedule_next_refresh()
-    {:ok, {cache, %{}}}
+    {:ok, {cache, %{}, []}}
   end
 
   @impl true
-  def handle_cast({:read, loc, caller}, {cache, instrs}) do
+  def handle_cast({:read, loc, caller}, {cache, instrs, targets}) do
     new_instr =
       if Map.has_key?(instrs, loc) do
         %{
@@ -36,13 +36,13 @@ defmodule SEDrive.Rw.Server do
       else
         %{read: [caller]}
       end
-    ret = {:noreply, {cache, Map.put(instrs, loc, new_instr)}}
+    ret = {:noreply, {cache, Map.put(instrs, loc, new_instr), targets}}
     IO.puts "READ #{inspect ret}"
     ret
   end
 
   @impl true
-  def handle_cast({:write, loc, contents}, {cache, instrs}) do
+  def handle_cast({:write, loc, contents}, {cache, instrs, targets}) do
     new_instr =
       if Map.has_key?(instrs, loc) do
         %{
@@ -55,13 +55,13 @@ defmodule SEDrive.Rw.Server do
           write: contents
         }
       end
-    ret = {:noreply, {cache, Map.put(instrs, loc, new_instr)}}
+    ret = {:noreply, {cache, Map.put(instrs, loc, new_instr), targets}}
     IO.puts "WRITE #{inspect ret}"
     ret
   end
 
   @impl true
-  def handle_info(:try_refresh, {cache, instrs}) do
+  def handle_info(:try_refresh, {cache, instrs, targets}) do
     remaining = Map.keys(instrs)
                 |> Enum.map(fn loc ->
                   try_refresh(cache, loc, instrs[loc])
@@ -76,7 +76,7 @@ defmodule SEDrive.Rw.Server do
                 end)
     instrs = Map.take(instrs, remaining)
     schedule_next_refresh()
-    {:noreply, {cache, instrs}}
+    {:noreply, {cache, instrs, targets ++ remaining}}
   end
 
   @spec try_refresh(Cache.t, Cache.query, instr) :: {:ok, boolean} | {:err, Exception.t}
