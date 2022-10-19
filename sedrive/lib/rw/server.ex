@@ -37,7 +37,6 @@ defmodule SEDrive.Rw.Server do
         %{read: [caller]}
       end
     ret = {:noreply, {cache, Map.put(instrs, loc, new_instr), targets}}
-    IO.puts "READ #{inspect ret}"
     ret
   end
 
@@ -56,7 +55,6 @@ defmodule SEDrive.Rw.Server do
         }
       end
     ret = {:noreply, {cache, Map.put(instrs, loc, new_instr), targets}}
-    IO.puts "WRITE #{inspect ret}"
     ret
   end
 
@@ -91,19 +89,15 @@ defmodule SEDrive.Rw.Server do
   defp try_refresh(cache, loc, instr) do
     IO.inspect {:fun, :try_refresh, cache, loc, instr}
     contents = Map.get(instr, :write)
-    IO.puts "IN TRY_REFRESH LOC IS:"
-    IO.inspect loc
     with {:ok, contents} <- RefreshSup.refresh(cache, loc, contents)
     do
       instr.read
       |> Enum.each(fn caller ->
         send caller, {:got, loc, contents}
       end)
-      IO.puts "(refresh ok)"
       {:ok, true}
     else
       {:err, :in_use} ->
-        IO.puts "(could not claim)"
         {:ok, false}
       {:err, :other, exn} -> {:err, exn}
     end
