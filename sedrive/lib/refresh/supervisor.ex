@@ -105,7 +105,9 @@ defmodule SEDrive.Refresh.Supervisor do
 
   @spec period_now :: nni
   defp period_now do
-    System.monotonic_time(:second) |> time_to_period
+    DateTime.utc_now()
+    |> DateTime.to_unix()
+    |> time_to_period
   end
 
   @spec time_to_period(nni) :: nni
