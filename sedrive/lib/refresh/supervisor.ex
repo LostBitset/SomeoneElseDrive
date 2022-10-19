@@ -94,7 +94,7 @@ defmodule SEDrive.Refresh.Supervisor do
     with {:ok, period_claimed?} <- claim_period(cache, loc, period)
     do
       if !period_claimed? do
-        find_src_period(cache, loc, period - 1)
+        find_src_period(cache, loc, period + 1)
       else
         {:ok, period}
       end
