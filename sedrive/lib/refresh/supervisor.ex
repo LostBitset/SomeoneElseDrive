@@ -110,7 +110,7 @@ defmodule SEDrive.Refresh.Supervisor do
 
   @spec time_to_period(nni) :: nni
   defp time_to_period(secs) do
-    secs |> div(5) |> Kernel.*(-1)
+    secs |> div(5)
   end
 end
 
