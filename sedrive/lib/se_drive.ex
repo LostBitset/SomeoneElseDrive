@@ -24,7 +24,7 @@ defmodule SEDrive do
     IO.puts "Welcome to SEDrive! Here are your choices for caches:"
     IO.puts "(toyota) Toyota, like the car company"
     IO.puts "(astrohamster) The fantastic website astrohamster.com"
-    IO.puts "(uk) In progress..."
+    IO.puts "(uk) The UK Parliment, we all know they're doing great right now <3"
     cache_choice = IO.gets "Which one would you like to use? "
     cache_choice = cache_choice
                    |> String.trim()
