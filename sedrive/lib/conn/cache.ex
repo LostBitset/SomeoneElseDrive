@@ -39,20 +39,6 @@ defmodule SEDrive.Conn.Cache do
     }
   end
 
-  @doc """
-  A helper function that allows you to check just one header,
-  looking for whether it contains a value rather than an exact match
-  """
-  @spec from_single_header_contains(String.t, String.t, String.t) :: t
-  def from_single_header_contains(url, header_name, hit_value) do
-    %__MODULE__{
-      url: & "#{url}?#{Enum.join(&1, "&")}",
-      hit?: (fn resp ->
-        is_header(resp, header_name, hit_value, &String.contains?/2)
-      end)
-    }
-  end
-
   defmodule CachingHeaderNotFoundError do
     @moduledoc """
     An exception that should be raised when the header used to indicate the status
