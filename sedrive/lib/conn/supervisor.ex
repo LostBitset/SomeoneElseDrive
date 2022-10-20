@@ -21,7 +21,8 @@ defmodule SEDrive.Conn.Supervisor do
   """
   @spec read_and_set(Cache.t, Cache.query) :: Cache.cache_result
   def read_and_set(cache, query) do
-    req = Finch.build(:get, cache.url.(query))
+    std_headers = []
+    req = Finch.build(:get, cache.url.(query), std_headers)
     with {:ok, %Finch.Response{headers: headers}} <- Finch.request(req, MainFinch)
     do
       cache.hit?.(headers)

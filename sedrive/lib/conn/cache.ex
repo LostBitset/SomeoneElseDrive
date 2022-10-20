@@ -47,15 +47,12 @@ defmodule SEDrive.Conn.Cache do
     defexception message: "The header used to indicate cache status was not found."
   end
 
-  defp is_header(headers, target_name, target_value, cmp \\ nil) do
+  defp is_header(headers, target_name, target_value) do
+    IO.inspect(headers)
     pair = Enum.find(headers, fn {name, _} -> name == target_name end)
     with {_, value} <- pair
     do
-      if cmp == nil do
-        {:ok, value == target_value}
-      else
-        {:ok, cmp.(value, target_value)}
-      end
+      {:ok, value == target_value}
     else
       nil -> {:err, CachingHeaderNotFoundError}
     end

@@ -27,7 +27,7 @@ defmodule SEDrive.Conn.Sources do
   @spec uk :: Cache.t
   def uk do
     Cache.from_single_header(
-      "https://www.parliament.uk/Content/img/illustration-developer.png",
+      "https://www.parliament.uk/static/fonts/National-LFS-Book.woff2",
       "cf-cache-status",
       "HIT"
     )

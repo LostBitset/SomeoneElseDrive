@@ -21,7 +21,22 @@ defmodule SEDrive do
   Just a test for now.
   """
   def main do
-    cache = SEDrive.Conn.Sources.astrohamster
+    IO.puts "Welcome to SEDrive! Here are your choices for caches:"
+    IO.puts "(toyota) Toyota, like the car company"
+    IO.puts "(astrohamster) The fantastic website astrohamster.com"
+    IO.puts "(uk) The UK parliment, we all know they're doing great right now <3"
+    cache_choice = IO.gets "Which one would you like to use? "
+    cache_choice = cache_choice
+                   |> String.trim()
+                   |> String.downcase()
+    cache = case cache_choice do
+      "toyota" ->
+        SEDrive.Conn.Sources.toyota
+      "astrohamster" ->
+        SEDrive.Conn.Sources.astrohamster
+      "uk" ->
+        SEDrive.Conn.Sources.uk
+    end
     RwSup.start_link(cache)
     key = IO.gets "Enter a key to identify this store: "
     key = String.trim(key)
