@@ -23,14 +23,5 @@ defmodule SEDrive.Conn.Sources do
       "HIT"
     )
   end
-
-  @spec uk :: Cache.t
-  def uk do
-    Cache.from_single_header(
-      "https://www.parliament.uk/static/fonts/National-LFS-Book.woff2",
-      "cf-cache-status",
-      "HIT"
-    )
-  end
 end
 

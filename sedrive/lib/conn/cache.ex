@@ -48,7 +48,6 @@ defmodule SEDrive.Conn.Cache do
   end
 
   defp is_header(headers, target_name, target_value) do
-    IO.inspect(headers)
     pair = Enum.find(headers, fn {name, _} -> name == target_name end)
     with {_, value} <- pair
     do
