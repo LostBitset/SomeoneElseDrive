@@ -24,6 +24,7 @@ defmodule SEDrive do
     IO.puts "Welcome to SEDrive! Here are your choices for caches:"
     IO.puts "(toyota) Toyota, like the car company"
     IO.puts "(astrohamster) The fantastic website astrohamster.com"
+    IO.puts "(uk) In progress..."
     cache_choice = IO.gets "Which one would you like to use? "
     cache_choice = cache_choice
                    |> String.trim()
@@ -33,6 +34,8 @@ defmodule SEDrive do
         SEDrive.Conn.Sources.toyota
       "astrohamster" ->
         SEDrive.Conn.Sources.astrohamster
+      "uk" ->
+        SEDrive.Conn.Sources.uk
     end
     RwSup.start_link(cache)
     key = IO.gets "Enter a key to identify this store: "

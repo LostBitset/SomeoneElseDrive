@@ -23,5 +23,14 @@ defmodule SEDrive.Conn.Sources do
       "HIT"
     )
   end
+
+  @spec uk :: Cache.t
+  def uk do
+    Cache.from_single_header(
+      "https://members-api.parliament.uk/api/Members/3482/Thumbnail",
+      "cf-cache-status",
+      "HIT"
+    )
+  end
 end
 
