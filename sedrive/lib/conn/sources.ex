@@ -15,13 +15,13 @@ defmodule SEDrive.Conn.Sources do
     )
   end
 
-  @spec organclearinghouse :: Cache.t
-  def organclearinghouse do
-    base = "https://assets.squarespace.com/@sqs/polyfiller/1.2.2/modern.js"
-    %Cache{
-      url: & "#{base}?#{Enum.join(&1, "&")}",
-      hit?: &String.contains?(&1, "HIT")
-    }
+  @spec astrohamster :: Cache.t
+  def astrohamster do
+    Cache.from_single_header(
+      "https://www.astrohamster.com/star.gif",
+      "x-cache",
+      "HIT"
+    )
   end
 end
 

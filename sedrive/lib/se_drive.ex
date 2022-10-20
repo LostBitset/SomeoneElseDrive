@@ -21,7 +21,7 @@ defmodule SEDrive do
   Just a test for now.
   """
   def main do
-    cache = SEDrive.Conn.Sources.toyota
+    cache = SEDrive.Conn.Sources.astrohamster
     RwSup.start_link(cache)
     key = IO.gets "Enter a key to identify this store: "
     key = String.trim(key)
