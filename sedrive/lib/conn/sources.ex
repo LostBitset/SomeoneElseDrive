@@ -14,5 +14,14 @@ defmodule SEDrive.Conn.Sources do
       "Hit from cloudfront"
     )
   end
+
+  @spec organclearinghouse :: Cache.t
+  def organclearinghouse do
+    base = "https://assets.squarespace.com/@sqs/polyfiller/1.2.2/modern.js"
+    %Cache{
+      url: & "#{base}?#{Enum.join(&1, "&")}",
+      hit?: &String.contains?(&1, "HIT")
+    }
+  end
 end
 
